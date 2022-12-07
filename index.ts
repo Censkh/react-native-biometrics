@@ -8,7 +8,9 @@ const { ReactNativeBiometrics: bridge } = NativeModules
 export type BiometryType = 'TouchID' | 'FaceID' | 'Biometrics'
 
 interface RNBiometricsOptions {
-  allowDeviceCredentials?: boolean
+    allowDeviceCredentials?: boolean,
+    // invalidates the key if the user adds a new fingerprint
+    invalidateOnEnrollment?: boolean
 }
 
 interface IsSensorAvailableResult {

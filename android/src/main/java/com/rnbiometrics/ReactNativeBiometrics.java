@@ -93,6 +93,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     @ReactMethod
     public void createKeys(final ReadableMap params, Promise promise) {
         try {
+            boolean invalidateOnEnrollment = params.getBoolean("invalidateOnEnrollment");
             if (isCurrentSDKMarshmallowOrLater()) {
                 deleteBiometricKey();
                 KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore");
@@ -101,7 +102,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                         .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
                         .setAlgorithmParameterSpec(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4))
                         .setUserAuthenticationRequired(true)
-                        .setInvalidatedByBiometricEnrollment(true)
+                        .setInvalidatedByBiometricEnrollment(invalidateOnEnrollment)
                         .build();
                 keyPairGenerator.initialize(keyGenParameterSpec);
 

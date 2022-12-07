@@ -48,8 +48,9 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     CFErrorRef error = NULL;
     BOOL allowDeviceCredentials = [RCTConvert BOOL:params[@"allowDeviceCredentials"]];
+    BOOL invalidateOnEnrollment = [RCTConvert BOOL:params[@"invalidateOnEnrollment"]];
 
-    SecAccessControlCreateFlags secCreateFlag = kSecAccessControlBiometryCurrentSet;
+    SecAccessControlCreateFlags secCreateFlag = invalidateOnEnrollment ? kSecAccessControlBiometryCurrentSet : kSecAccessControlBiometryAny;
 
     if (allowDeviceCredentials == TRUE) {
       secCreateFlag = kSecAccessControlUserPresence;
