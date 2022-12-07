@@ -1,6 +1,6 @@
 {
-  "name": "react-native-biometrics-ea",
-  "version": "2.1.4",
+  "name": "react-native-biometrics",
+  "version": "3.0.1",
   "summary": "A React Native library for biometrics (fork of https://github.com/SelfLender/react-native-biometrics)",
   "description": "React Native biometric functionality for signing and encryption. Supports deactivation of encryption on domain-state change (fork of https://github.com/SelfLender/react-native-biometrics)",
   "main": "build/cjs/index.js",

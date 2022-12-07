@@ -8,7 +8,7 @@ React native biometrics is a simple bridge to native iOS and Android keystore ma
 
 | `react-native-biometrics` version | Required React Native Version |
 |:---------------------------------:|:-----------------------------:|
-| `>= 2.0.0`                        | `>= 0.60`                     |
+| `>= 3.0.0`                        | `>= 0.60`                     |
 | `<= 1.7.0`                        | `<= 0.59.x`                   |
 
 ## Getting started
@@ -21,6 +21,10 @@ or npm:
 
 `$ npm install react-native-biometrics --save`
 
+### Install pods
+
+`$ npx pod-install`
+
 ### Link / Autolinking
 
 On React Native 0.60+ the [CLI autolink feature](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) links the module while building the app.
@@ -31,7 +35,7 @@ On React Native 0.60+ the [CLI autolink feature](https://github.com/react-native
 
 This package requires an iOS target SDK version of iOS 10 or higher
 
-Ensure that you have the `NSFaceIDUsageDescription` entry set in your react native iOS project, or Face ID will not work properly.  This description will be will be presented to the user the first time a biometrics action is taken, and the user will be asked if they want to allow the app to use Face ID.  If the user declines the usage of face id for the app, the `isSensorAvailable` function will indicate biometrics is unavailable until the face id permission is specifically allowed for the app by the user.
+Ensure that you have the `NSFaceIDUsageDescription` entry set in your react native iOS project, or Face ID will not work properly.  This description will be presented to the user the first time a biometrics action is taken, and the user will be asked if they want to allow the app to use Face ID.  If the user declines the usage of face id for the app, the `isSensorAvailable` function will indicate biometrics is unavailable until the face id permission is specifically allowed for the app by the user.
 
 #### Android
 
@@ -41,11 +45,11 @@ This package requires a compiled SDK version of 29 (Android 10.0) or higher
 
 This package is designed to make server authentication using biometrics easier.  Here is an image from https://android-developers.googleblog.com/2015/10/new-in-android-samples-authenticating.html illustrating the basic use case:
 
-![react-native-biometrics](https://2.bp.blogspot.com/-Lp2zaAZietw/Vi59hb6k6SI/AAAAAAAABLk/HsXXBYiIwqU/s1600/image01.png)
+![react-native-biometrics](/assets/biometricsdiagram.png)
 
 When a user enrolls in biometrics, a key pair is generated.  The private key is stored securely on the device and the public key is sent to a server for registration.  When the user wishes to authenticate, the user is prompted for biometrics, which unlocks the securely stored private key.  Then a cryptographic signature is generated and sent to the server for verification.  The server then verifies the signature.  If the verification was successful, the server returns an appropriate response and authorizes the user.
 
-## Constants
+## Biometry Types
 
 ### TouchID (iOS only)
 
@@ -54,11 +58,13 @@ A constant for the touch id sensor type, evaluates to `'TouchID'`
 __Example__
 
 ```js
-import ReactNativeBiometrics from 'react-native-biometrics'
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 
-const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
+const rnBiometrics = new ReactNativeBiometrics()
 
-if (biometryType === ReactNativeBiometrics.TouchID) {
+const { biometryType } = await rnBiometrics.isSensorAvailable()
+
+if (biometryType === BiometryTypes.TouchID) {
   //do something fingerprint specific
 }
 ```
@@ -70,11 +76,13 @@ A constant for the face id sensor type, evaluates to `'FaceID'`
 __Example__
 
 ```js
-import ReactNativeBiometrics from 'react-native-biometrics'
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 
-const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
+const rnBiometrics = new ReactNativeBiometrics()
 
-if (biometryType === ReactNativeBiometrics.FaceID) {
+const { biometryType } = await rnBiometrics.isSensorAvailable()
+
+if (biometryType === BiometryTypes.FaceID) {
   //do something face id specific
 }
 ```
@@ -86,16 +94,37 @@ A constant for generic Biometrics, evaluates to `'Biometrics'`
 __Example__
 
 ```js
-import ReactNativeBiometrics from 'react-native-biometrics'
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 
-const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
+const rnBiometrics = new ReactNativeBiometrics()
 
-if (biometryType === ReactNativeBiometrics.Biometrics) {
+const { biometryType } = await rnBiometrics.isSensorAvailable()
+
+if (biometryType === BiometryTypes.Biometrics) {
   //do something face id specific
 }
 ```
 
-## Methods
+## Class
+
+## Constructor
+
+__Options Object__
+| Parameter | Type | Description | iOS | Android |
+| --- | --- | --- | --- | --- |
+| allowDeviceCredentials | boolean | Boolean that will enable the ability for the device passcode to be used instead of biometric information. On iOS, the prompt will only be shown after biometrics has failed twice. On Android, the prompt will be shown on the biometric prompt and does not require the user to attempt to use biometrics information first. Note: This feature is not supported on Android versions prior to API 30. | ✔ | ✔ |
+
+__Example__
+
+```js
+import ReactNativeBiometrics from 'react-native-biometrics'
+
+const rnBiometrics = new ReactNativeBiometrics({ allowDeviceCredentials: true })
+
+// Perform operations as normal
+// All prompts will allow for fallback to the device's credentials for authentication
+
+```
 
 ### isSensorAvailable()
 
@@ -112,17 +141,19 @@ __Result Object__
 __Example__
 
 ```js
-import ReactNativeBiometrics from 'react-native-biometrics'
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 
-ReactNativeBiometrics.isSensorAvailable()
+const rnBiometrics = new ReactNativeBiometrics()
+
+rnBiometrics.isSensorAvailable()
   .then((resultObject) => {
     const { available, biometryType } = resultObject
 
-    if (available && biometryType === ReactNativeBiometrics.TouchID) {
+    if (available && biometryType === BiometryTypes.TouchID) {
       console.log('TouchID is supported')
-    } else if (available && biometryType === ReactNativeBiometrics.FaceID) {
+    } else if (available && biometryType === BiometryTypes.FaceID) {
       console.log('FaceID is supported')
-    } else if (available && biometryType === ReactNativeBiometrics.Biometrics) {
+    } else if (available && biometryType === BiometryTypes.Biometrics) {
       console.log('Biometrics is supported')
     } else {
       console.log('Biometrics not supported')
@@ -145,7 +176,9 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-ReactNativeBiometrics.createKeys('Confirm fingerprint')
+const rnBiometrics = new ReactNativeBiometrics()
+
+rnBiometrics.createKeys()
   .then((resultObject) => {
     const { publicKey } = resultObject
     console.log(publicKey)
@@ -168,7 +201,8 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-ReactNativeBiometrics.biometricKeysExist()
+const rnBiometrics = new ReactNativeBiometrics()
+rnBiometrics.biometricKeysExist()
   .then((resultObject) => {
     const { keysExist } = resultObject
 
@@ -195,7 +229,9 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-ReactNativeBiometrics.deleteKeys()
+const rnBiometrics = new ReactNativeBiometrics()
+
+rnBiometrics.deleteKeys()
   .then((resultObject) => {
     const { keysDeleted } = resultObject
 
@@ -237,7 +273,9 @@ import ReactNativeBiometrics from 'react-native-biometrics'
 let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
 let payload = epochTimeSeconds + 'some message'
 
-ReactNativeBiometrics.createSignature({
+const rnBiometrics = new ReactNativeBiometrics()
+
+rnBiometrics.createSignature({
     promptMessage: 'Sign in',
     payload: payload
   })
@@ -262,6 +300,7 @@ __Options Object__
 | Parameter | Type | Description | iOS | Android |
 | --- | --- | --- | --- | --- |
 | promptMessage | string | Message that will be displayed in the biometrics prompt | ✔ | ✔ |
+| fallbackPromptMessage | string | Message that will be shown when FaceID or TouchID has failed and a passcode has been set on the device. | ✔ | ✖ |
 | cancelButtonText | string | Text to be displayed for the cancel button on biometric prompts, defaults to `Cancel` | ✖ | ✔ |
 
 __Result Object__
@@ -276,7 +315,9 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-ReactNativeBiometrics.simplePrompt({promptMessage: 'Confirm fingerprint'})
+const rnBiometrics = new ReactNativeBiometrics()
+
+rnBiometrics.simplePrompt({promptMessage: 'Confirm fingerprint'})
   .then((resultObject) => {
     const { success } = resultObject
 
