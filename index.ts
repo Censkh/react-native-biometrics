@@ -138,6 +138,7 @@ export module ReactNativeBiometricsLegacy {
 
 export default class ReactNativeBiometrics {
     allowDeviceCredentials = false
+    invalidateOnEnrollment = false
 
     /**
      * @param {Object} rnBiometricsOptions
@@ -146,6 +147,9 @@ export default class ReactNativeBiometrics {
     constructor(rnBiometricsOptions?: RNBiometricsOptions) {
       const allowDeviceCredentials = rnBiometricsOptions?.allowDeviceCredentials ?? false
       this.allowDeviceCredentials = allowDeviceCredentials
+
+        const invalidateOnEnrollment = rnBiometricsOptions?.invalidateOnEnrollment ?? false
+        this.invalidateOnEnrollment = invalidateOnEnrollment
     }
 
     /**
@@ -165,7 +169,8 @@ export default class ReactNativeBiometrics {
      */
     createKeys(): Promise<CreateKeysResult> {
       return bridge.createKeys({
-        allowDeviceCredentials: this.allowDeviceCredentials
+          allowDeviceCredentials: this.allowDeviceCredentials,
+          invalidateOnEnrollment: this.invalidateOnEnrollment
       })
     }
 

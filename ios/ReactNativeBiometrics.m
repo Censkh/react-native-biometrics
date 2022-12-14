@@ -50,7 +50,7 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
     BOOL allowDeviceCredentials = [RCTConvert BOOL:params[@"allowDeviceCredentials"]];
     BOOL invalidateOnEnrollment = [RCTConvert BOOL:params[@"invalidateOnEnrollment"]];
 
-    SecAccessControlCreateFlags secCreateFlag = invalidateOnEnrollment ? kSecAccessControlBiometryCurrentSet : kSecAccessControlBiometryAny;
+    SecAccessControlCreateFlags secCreateFlag = invalidateOnEnrollment == TRUE ? kSecAccessControlBiometryCurrentSet : kSecAccessControlBiometryAny;
 
     if (allowDeviceCredentials == TRUE) {
       secCreateFlag = kSecAccessControlUserPresence;
@@ -91,6 +91,7 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
 
       NSDictionary *result = @{
         @"publicKey": publicKeyString,
+        @"invalidate": invalidateOnEnrollment == TRUE ? @(YES) : @(NO)
       };
       resolve(result);
     } else {
@@ -225,7 +226,7 @@ RCT_EXPORT_METHOD(biometricKeysExist: (RCTPromiseResolveBlock)resolve rejecter:(
 }
 
 - (NSData *) getBiometricKeyTag {
-  NSString *biometricKeyAlias = @"com.rnbiometrics.biometricKey";
+  NSString *biometricKeyAlias = @"com.rnbiometrics.biometricKey2";
   NSData *biometricKeyTag = [biometricKeyAlias dataUsingEncoding:NSUTF8StringEncoding];
   return biometricKeyTag;
 }
